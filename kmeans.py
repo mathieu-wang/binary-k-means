@@ -18,8 +18,20 @@ def hamming_dist(num1, num2):
 # because it has run a maximum number of iterations _o_r the centroids
 # stop changing.
 def should_stop(old_centroids, centroids, iterations):
-    if iterations > MAX_ITERATIONS: return True
+    if iterations > MAX_ITERATIONS:
+        return True
     return old_centroids == centroids
+
+
+def find_closest_centroid(bitvector, centroids):
+    min_hamming_dist = float("inf")
+    closest_centroid = None
+    for centroid in centroids:
+        cur_hamming_dist = hamming_dist(bitvector, centroid)
+        if cur_hamming_dist < min_hamming_dist:
+            min_hamming_dist = cur_hamming_dist
+            closest_centroid = centroid
+    return closest_centroid, min_hamming_dist
 
 
 # _function: _get _labels
@@ -28,7 +40,9 @@ def should_stop(old_centroids, centroids, iterations):
 def get_labels(dataset, centroids):
     # _for each element in the dataset, chose the closest centroid.
     # _make that centroid the element's label.
-    # for datum in dataset:
+    labels = []
+    for bitvector in dataset:
+        labels.append(find_closest_centroid(bitvector, centroids))
     pass
 
 
@@ -68,7 +82,7 @@ def kmeans(dataset, k):
         iterations += 1
 
         # Assign labels to each datapoint based on centroids
-        labels = get_labels(dataset, centroids)
+        labels, dist_to_centroid = get_labels(dataset, centroids)
 
         # Assign centroids based on datapoint labels
         centroids = get_centroids(dataset, labels, k)
