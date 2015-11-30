@@ -1,4 +1,5 @@
 import random
+import utils
 
 MAX_ITERATIONS = 100
 
@@ -31,7 +32,7 @@ def find_closest_centroid(bitvector, centroids):
         if cur_hamming_dist < min_hamming_dist:
             min_hamming_dist = cur_hamming_dist
             closest_centroid = centroid
-    return closest_centroid, min_hamming_dist
+    return closest_centroid
 
 
 # _function: _get _labels
@@ -41,9 +42,9 @@ def get_labels(dataset, centroids):
     # _for each element in the dataset, chose the closest centroid.
     # _make that centroid the element's label.
     labels = []
-    for bitvector in dataset:
-        labels.append(find_closest_centroid(bitvector, centroids))
-    pass
+    for bit_vector in dataset:
+        labels.append(find_closest_centroid(bit_vector, centroids))
+    return labels
 
 
 # _function: _get _centroids
@@ -53,13 +54,33 @@ def get_centroids(dataset, labels, k):
     # _each centroid is the geometric mean of the points that
     # have that centroid's label. _important: _if a centroid is empty (no points have
     # that centroid's label) you should randomly re-initialize it.
-    pass
+    new_centroids = []
+    label_sum_dict = {}
+    # sums = [0 for _ in xrange[k]]
+    for idx, bit_vector in enumerate(dataset):
+        number = utils.byte_array_to_long(bit_vector)
+        # print labels[idx]
+        label = labels[idx].tostring()
+        if label not in label_sum_dict:
+            label_sum_dict[label] = [0, 0]
+        label_sum_dict[label][0] += number  # add to sum
+        label_sum_dict[label][1] += 1  # increment counter
+
+    # if some centroids do not have elements in their cluster, choose new ones at random
+    missing_centroids = k - len(label_sum_dict)
+    if missing_centroids > 0:
+        new_centroids.extend(get_random_centroids(dataset, missing_centroids))
+
+    for key, value in label_sum_dict.iteritems():
+        new_centroids.append(value[0]/value[1])
+
+    return new_centroids
 
 
 # Returns k centroids chosen randomly
 def get_random_centroids(dataset, k):
     length = len(dataset)
-    return [dataset[random.randint(0, length)] for _ in xrange(k)]
+    return [dataset[random.randint(0, length-1)] for _ in xrange(k)]
 
 
 # _function: _k _means
@@ -82,7 +103,7 @@ def kmeans(dataset, k):
         iterations += 1
 
         # Assign labels to each datapoint based on centroids
-        labels, dist_to_centroid = get_labels(dataset, centroids)
+        labels = get_labels(dataset, centroids)
 
         # Assign centroids based on datapoint labels
         centroids = get_centroids(dataset, labels, k)
