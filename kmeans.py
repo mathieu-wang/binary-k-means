@@ -1,8 +1,9 @@
 import random
 import utils
 import sys
+from pprint import pprint
 
-MAX_ITERATIONS = 100
+MAX_ITERATIONS = 1000000000000000000
 
 
 def hamming_dist(num1, num2):
@@ -22,7 +23,14 @@ def hamming_dist(num1, num2):
 def should_stop(old_centroids, centroids, iterations):
     if iterations > MAX_ITERATIONS:
         return True
-    return old_centroids == centroids
+    if old_centroids == None or centroids == None:
+        return False
+    for i in xrange(len(centroids)):
+        # pprint(old_centroids)
+        # pprint(centroids)
+        if not (old_centroids[i] == centroids[i]).all():
+            return False
+    return True
 
 
 def find_closest_centroid(bitvector, centroids):
@@ -51,7 +59,7 @@ def get_labels(dataset, centroids):
 # _function: _get _centroids
 # -------------
 # _returns k random centroids, each of dimension n.
-def get_centroids(dataset, labels, k):
+def get_centroids(dataset, labels, k, bits):
     # _each centroid is the geometric mean of the points that
     # have that centroid's label. _important: _if a centroid is empty (no points have
     # that centroid's label) you should randomly re-initialize it.
@@ -73,7 +81,7 @@ def get_centroids(dataset, labels, k):
         new_centroids.extend(get_random_centroids(dataset, missing_centroids))
 
     for key, value in label_sum_dict.iteritems():
-        new_centroids.append(value[0]/value[1])
+        new_centroids.append(utils.long_to_byte_array(value[0]/value[1], bits))
 
     return new_centroids
 
@@ -89,7 +97,7 @@ def get_random_centroids(dataset, k):
 # _k-_means is an algorithm that takes in a dataset and a constant
 # k and returns k centroids (which define clusters of data in the
 # dataset which are similar to one another).
-def kmeans(dataset, k):
+def kmeans(dataset, k, bits):
 
     # _initialize centroids randomly
     # num_features = get_num_features(dataset)
@@ -100,6 +108,7 @@ def kmeans(dataset, k):
 
     # _run the main k-means algorithm
     while not should_stop(old_centroids, centroids, iterations):
+        print "Iteration:", iterations
         old_centroids = centroids
         iterations += 1
 
@@ -107,7 +116,7 @@ def kmeans(dataset, k):
         labels = get_labels(dataset, centroids)
 
         # Assign centroids based on datapoint labels
-        centroids = get_centroids(dataset, labels, k)
+        centroids = get_centroids(dataset, labels, k, bits)
 
     # _we can get the labels too by calling get_labels(data_set, centroids)
     return centroids
