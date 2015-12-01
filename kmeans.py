@@ -2,8 +2,9 @@ import random
 import utils
 import sys
 from pprint import pprint
+from multi_index_hashing import MihTable
 
-MAX_ITERATIONS = 1000000000000000000
+MAX_ITERATIONS = 10000
 
 
 def hamming_dist(num1, num2):
@@ -26,8 +27,8 @@ def should_stop(old_centroids, centroids, iterations):
     if old_centroids == None or centroids == None:
         return False
     for i in xrange(len(centroids)):
-        # pprint(old_centroids)
-        # pprint(centroids)
+        pprint(old_centroids)
+        pprint(centroids)
         if not (old_centroids[i] == centroids[i]).all():
             return False
     return True
@@ -42,6 +43,18 @@ def find_closest_centroid(bitvector, centroids):
             min_hamming_dist = cur_hamming_dist
             closest_centroid = centroid
     return closest_centroid
+
+
+def build_mih_table(mih_table, centroids):
+    for centroid in centroids:
+        mih_table.add(centroid)
+
+
+def get_labels_mih(dataset, mih_table):
+    labels = []
+    for bit_vector in dataset:
+        labels.append(mih_table.lookup(bit_vector, 1))
+    return labels
 
 
 # _function: _get _labels
@@ -119,4 +132,27 @@ def kmeans(dataset, k, bits):
         centroids = get_centroids(dataset, labels, k, bits)
 
     # _we can get the labels too by calling get_labels(data_set, centroids)
+    return centroids
+
+
+def binary_kmeans(dataset, k, bits):
+    centroids = get_random_centroids(dataset, k)
+
+    iterations = 0
+    old_centroids = None
+
+    while not should_stop(old_centroids, centroids, iterations):
+        print "Iteration:", iterations
+        old_centroids = centroids
+        iterations += 1
+
+        mih_table = MihTable(bits, bits/8, 10)
+
+        build_mih_table(mih_table, centroids)
+        # Assign labels to each datapoint based on centroids
+        labels = get_labels_mih(dataset, mih_table)
+
+        # Assign centroids based on datapoint labels
+        centroids = get_centroids(dataset, labels, k, bits)
+
     return centroids
