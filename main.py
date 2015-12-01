@@ -23,7 +23,12 @@ start_time = time.time()
 #
 # mih_table.lookup(np.array(148,  55, 150,  18,  28, 192, 230, 247))
 
-binary_kmeans(data, 10, 64, 10.0)
+# binary_kmeans(data, 10, 64, 16.0)
+
+from multi_index_hashing import generate_close_chunks
+print bin(15)
+for chunk in generate_close_chunks(15, 8, 16):
+    print bin(chunk)
 
 print("--- %s seconds ---" % (time.time() - start_time))
 

@@ -11,17 +11,22 @@ def generate_close_chunks(chunk, M, radius):
     # I'll also leave this one for the reader
     # eg: find_close_chunks(0000) -> [0000, 1000, 0100, 0010, 0001]
     # eg: find_close_chunks(1011) -> [1011, 0011, 0111, 1001, 1010]
-    
-    chunk_rad = radius/M
+
+    chunk_rad = int(radius/M)
     close_chunks = []
 
-    close_chunks.append(chunk)
-
-
-    # TODO generate codes at specific hamming distance
-
+    if chunk_rad == 0:
+        close_chunks.append(chunk)
+    elif chunk_rad == 1:
+        binary = bin(chunk)[2:]
+        for i in xrange(len(binary)):
+            close_chunks.append(chunk ^ (1 << i))
+    elif chunk_rad == 2:
+        binary = bin(chunk)[2:]
+        for i in xrange(len(binary)):
+            for j in xrange (i+1, len(binary)):
+                close_chunks.append(chunk ^ (1 << i) ^ (1 << j))
     return close_chunks
-
 
 class MihTable:
     def __init__(self, num_bits, num_chunks, radius):
