@@ -6,13 +6,17 @@ def split_chunks(bit_vector, M):
     return chunks
 
 
-def generate_close_chunks(chunk, K):
+def generate_close_chunks(chunk, M, radius):
     # returns a list of all possible chunks that is zero or one bit off of the input
     # I'll also leave this one for the reader
     # eg: find_close_chunks(0000) -> [0000, 1000, 0100, 0010, 0001]
     # eg: find_close_chunks(1011) -> [1011, 0011, 0111, 1001, 1010]
+    
+    chunk_rad = radius/M
     close_chunks = []
+
     close_chunks.append(chunk)
+
 
     # TODO generate codes at specific hamming distance
 
@@ -26,12 +30,12 @@ class MihTable:
         self.M = num_chunks
         self.R = radius
 
-        self.hash_tables = [dict() for _ in xrange(self.M)]  # a list of M hash tables
+        self.hash_tables = [dict() for _ in xrange(int(self.M))]  # a list of M hash tables
 
     def add(self, bit_vector):
         chunks = split_chunks(bit_vector, self.M)
 
-        for i in xrange(self.M):
+        for i in xrange(int(self.M)):
             hash_table = self.hash_tables[i]  # fetch the ith hash table
             chunk = chunks[i]  # fetch the ith chunk of the bit_vector
 
@@ -41,23 +45,23 @@ class MihTable:
             hash_table[chunk].append(bit_vector)
 
     # K-NN search
-    def lookup(self, bit_vector, K):
+    def lookup(self, bit_vector):
         chunks = split_chunks(bit_vector, self.M)
 
         # TODO: go in increasing search radius
 
-        for i in xrange(self.M):
+        for i in xrange(int(self.M)):
             hash_table = self.hash_tables[i]
             chunk = chunks[i]
 
-            matches = []
-            close_chunks = generate_close_chunks(chunk, K)
+            candidates = []
+            close_chunks = generate_close_chunks(chunk, self.M, self.R)
 
             for close_chunk in close_chunks:
                 if close_chunk in hash_table:
-                    matches.append(hash_table[close_chunk])
+                    candidates.append(hash_table[close_chunk])
 
-            if len(matches) > 0:
-                return matches
-
+            if len(candidates) > 0:
+                print len(candidates)
+                return candidates
         return []

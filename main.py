@@ -2,6 +2,7 @@ import numpy as np, h5py
 import time
 import utils
 from kmeans import kmeans
+from kmeans import binary_kmeans
 from multi_index_hashing import MihTable
 import sys
 from pprint import pprint
@@ -15,10 +16,14 @@ start_time = time.time()
 # centroids = kmeans(data, 2, 64)
 # print centroids
 
-mih_table = MihTable(64, 64/8, 10)
-for bit_vector in data:
-    mih_table.add(bit_vector)
-pprint(mih_table.hash_tables)
+# mih_table = MihTable(64, 64/8, 10)
+# for bit_vector in data:
+#     mih_table.add(bit_vector)
+# pprint(mih_table.hash_tables)
+#
+# mih_table.lookup(np.array(148,  55, 150,  18,  28, 192, 230, 247))
+
+binary_kmeans(data, 10, 64, 10.0)
 
 print("--- %s seconds ---" % (time.time() - start_time))
 

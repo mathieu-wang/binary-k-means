@@ -50,10 +50,12 @@ def build_mih_table(mih_table, centroids):
         mih_table.add(centroid)
 
 
-def get_labels_mih(dataset, mih_table):
+def get_labels_mih(dataset, mih_table, radius):
     labels = []
     for bit_vector in dataset:
-        labels.append(mih_table.lookup(bit_vector, 1))
+        for r in xrange(1, int(radius+1)):
+            # candidates =
+            labels.append(mih_table.lookup(bit_vector))
     return labels
 
 
@@ -135,7 +137,7 @@ def kmeans(dataset, k, bits):
     return centroids
 
 
-def binary_kmeans(dataset, k, bits):
+def binary_kmeans(dataset, k, bits, radius):
     centroids = get_random_centroids(dataset, k)
 
     iterations = 0
@@ -146,11 +148,11 @@ def binary_kmeans(dataset, k, bits):
         old_centroids = centroids
         iterations += 1
 
-        mih_table = MihTable(bits, bits/8, 10)
+        mih_table = MihTable(bits, bits/8.0, radius)
 
         build_mih_table(mih_table, centroids)
         # Assign labels to each datapoint based on centroids
-        labels = get_labels_mih(dataset, mih_table)
+        labels = get_labels_mih(dataset, mih_table, radius)
 
         # Assign centroids based on datapoint labels
         centroids = get_centroids(dataset, labels, k, bits)
