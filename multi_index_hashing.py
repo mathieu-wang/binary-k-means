@@ -67,6 +67,6 @@ class MihTable:
                     candidates.append(hash_table[close_chunk])
 
             if len(candidates) > 0:
-                print len(candidates)
+                # print len(candidates)
                 return candidates
         return []
