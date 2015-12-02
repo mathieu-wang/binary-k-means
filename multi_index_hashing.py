@@ -3,6 +3,8 @@ def split_chunks(bit_vector, M):
     # I'll leave this as an exercise for the reader
     # eg: split_chunks(1001101110010011, 4) -> [1001, 1011, 1001, 0011]
     chunks = bit_vector
+    # if M == len(bit_vector)/2:
+    #     chunks =
     return chunks
 
 
